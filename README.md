@@ -4,70 +4,66 @@
 
 **URL**: https://lovable.dev/projects/5d1c3b13-6c64-4209-8368-757ba73358b0
 
-## How can I edit this code?
+# ApparelCycle Hub
 
-There are several ways of editing your application.
+This repository contains a Vite + React frontend and an Express backend that serves API endpoints for donations.
 
-**Use Lovable**
+## Run locally
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/5d1c3b13-6c64-4209-8368-757ba73358b0) and start prompting.
+1. Install dependencies
 
-Changes made via Lovable will be committed automatically to this repo.
+```powershell
+npm install
+```
 
-**Use your preferred IDE**
+2. Create a `.env` file in the project root (see `.env.example`) and set:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+```
+MONGODB_URI=mongodb://127.0.0.1:27017/apparelcycle
+EMAIL_USER=youremail@example.com
+EMAIL_PASS=your-email-password
+JWT_SECRET=some-secret
+```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+3. Start backend and frontend (two terminals):
 
-Follow these steps:
+```powershell
+# terminal 1 - backend
+npm run start
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# terminal 2 - frontend
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Open the app at `http://localhost:5174` (Vite may choose a different port if 5173 is in use).
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Build and serve production
 
-**Use GitHub Codespaces**
+```powershell
+npm run build
+NODE_ENV=production npm run start
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+This will build the frontend into `dist` and the backend will serve it when `NODE_ENV=production`.
 
-## What technologies are used for this project?
+## Docker
 
-This project is built with .
+Build and run:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+```powershell
+docker build -t apparelcycle:latest .
+docker run -p 5000:5000 --env-file .env apparelcycle:latest
+```
 
-## How can I deploy this project?
+## Deploy
 
-Simply open [Lovable](https://lovable.dev/projects/5d1c3b13-6c64-4209-8368-757ba73358b0) and click on Share -> Publish.
+See `.github/workflows/ci-deploy.yml` for a CI example that builds the app on push to `main`. Add deployment steps to the `deploy` job based on your host (Render, DigitalOcean App Platform, VPS, etc.).
 
-## Can I connect a custom domain to my Lovable project?
+### Quick deploy options
 
+- Render: create a Web Service, set build command `npm run build` and start command `NODE_ENV=production node server.cjs`. Add environment variables in Render UI.
+- Vercel: typically serves frontend only; to serve backend you can deploy backend separately (e.g., Render) and set API URL in frontend env.
+- Docker/VPS: build the Docker image and run as shown above.
+
+If you want, I can initialize a Git repo for you, create a remote GitHub repository, push the code, and (optionally) set up a simple Render or GitHub Actions deployment. Tell me which hosting provider you'd like (Render, Vercel, DigitalOcean App Platform, or a VPS) and whether you want me to create the GitHub repo and push (I'll need a GitHub access token if you want me to create the remote and push automatically).
 Yes it is!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)

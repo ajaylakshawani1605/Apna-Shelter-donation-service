@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Donate from "./pages/Donate";
 import NotFound from "./pages/NotFound";
+import AdminDonations from "./pages/AdminDonations";
 import CampaignRegistration from "./pages/CampaignRegistration";
 import PrivateRoute from "@/components/PrivateRoute";
 
@@ -33,6 +34,7 @@ const App = () => {
               <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
               <Route path="/login" element={<Login />} />
               <Route path="/donate" element={<PrivateRoute><Donate /></PrivateRoute>} />
+              <Route path="/admin-donations" element={<AdminDonations />} />
               <Route path="/404" element={<NotFound />} />
               <Route path="*" element={<Navigate to="/404" replace />} />
             </Routes>

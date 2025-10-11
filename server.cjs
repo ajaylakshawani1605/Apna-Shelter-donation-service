@@ -1,14 +1,14 @@
-
-import 'dotenv/config';
-import express from 'express';
-import mongoose from 'mongoose';
-import cors from 'cors';
-import path from 'path';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
-import nodemailer from 'nodemailer';
-import otpGenerator from 'otp-generator';
-import { User } from './src/models/User.js';
+const dotenv = require('dotenv');
+dotenv.config();
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const path = require('path');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const nodemailer = require('nodemailer');
+const otpGenerator = require('otp-generator');
+const { User } = require('./src/models/User.js');
 const app = express();
 
 // Email configuration
@@ -175,40 +175,44 @@ app.post('/api/auth/verify-otp', async (req, res) => {
 
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, phone, address } = req.body;
     console.log('Registration attempt for:', email);
-    
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       console.log('User already exists:', email);
       return res.status(400).json({ message: 'User already exists' });
     }
-    
     // Create new user (password will be hashed by the User model)
     console.log('Creating new user with email:', email);
-    const user = new User({ name, email, password });
+    const user = new User({ name, email, password, phone, address });
     await user.save();
     console.log('User created successfully:', email);
-    
     // Generate token
     const token = jwt.sign(
       { userId: user._id },
       process.env.JWT_SECRET || 'your-secret-key',
       { expiresIn: '24h' }
     );
-    
     res.status(201).json({
       token,
       user: {
         id: user._id,
         name: user.name,
         email: user.email,
+        phone: user.phone,
+        address: user.address,
         role: user.role
       }
     });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error('Registration error:', error);
+    if (error instanceof mongoose.Error.ValidationError) {
+      for (const field in error.errors) {
+        console.error(`Validation error for ${field}:`, error.errors[field].message);
+      }
+    }
+    res.status(400).json({ message: error.message, error });
   }
 });
 
@@ -347,6 +351,17 @@ app.get('/api/donations/report', async (req, res) => {
 
 // Server setup
 const PORT = process.env.PORT || 5000;
+// Serve frontend build in production
+if (process.env.NODE_ENV === 'production') {
+  const buildPath = path.join(__dirname, 'dist');
+  app.use(express.static(buildPath));
+
+  // For any other route, serve the index.html from the build
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(buildPath, 'index.html'));
+  });
+}
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

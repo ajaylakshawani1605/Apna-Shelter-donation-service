@@ -16,12 +16,14 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       if (isRegistering) {
-        await register(name, email, password);
+        await register(name, email, password, phone, address);
         toast({
           title: "Success",
           description: "Registration successful! You can now log in.",
@@ -64,14 +66,39 @@ const Login = () => {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-4">
                   {isRegistering && (
-                    <Input
-                      placeholder="Full Name"
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      required
-                      className="border-brand-orange/50 focus:border-brand-orange"
-                    />
+                    <>
+                      <Input
+                        placeholder="Full Name"
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                        className="border-brand-orange/50 focus:border-brand-orange"
+                      />
+                      <Input
+                        placeholder="Phone Number"
+                        type="tel"
+                        value={phone}
+                        pattern="^[0-9]{10}$"
+                        maxLength={10}
+                        minLength={10}
+                        inputMode="numeric"
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/[^0-9]/g, '');
+                          if (val.length <= 10) setPhone(val);
+                        }}
+                        required
+                        className="border-brand-orange/50 focus:border-brand-orange"
+                      />
+                      <Input
+                        placeholder="Address"
+                        type="text"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        required
+                        className="border-brand-orange/50 focus:border-brand-orange"
+                      />
+                    </>
                   )}
                   
                   <Input

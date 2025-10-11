@@ -7,13 +7,15 @@ interface User {
   name: string;
   email: string;
   role: string;
+  phone?: string;
+  address?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   token: string | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string, phone: string, address: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -80,12 +82,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const register = async (name: string, email: string, password: string) => {
+  const register = async (name: string, email: string, password: string, phone: string, address: string) => {
     try {
       const response = await axios.post('http://localhost:5000/api/auth/register', {
         name,
         email,
         password,
+        phone,
+        address,
       });
       const { token: newToken, user: userData } = response.data;
       setToken(newToken);

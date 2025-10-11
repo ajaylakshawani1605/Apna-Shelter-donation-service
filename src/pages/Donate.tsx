@@ -23,18 +23,47 @@ const Donate = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     donorName: user?.name || "",
-    contact: "",
+    contact: user?.phone || "",
     location: ""
   });
+  const [locationSuggestions, setLocationSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   useEffect(() => {
     if (user) {
       setFormData(prev => ({
         ...prev,
-        donorName: user.name
+        donorName: user.name || "",
+        contact: user.phone || ""
+      }));
+    } else {
+      // fallback to localStorage if user is not present in context
+      const localUser = JSON.parse(localStorage.getItem('user') || '{}');
+      setFormData(prev => ({
+        ...prev,
+        donorName: localUser.name || "",
+        contact: localUser.phone || ""
       }));
     }
   }, [user]);
+
+  // Fetch suggestions from Nominatim API
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (formData.location.length < 3) {
+        setLocationSuggestions([]);
+        return;
+      }
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(formData.location)}&addressdetails=1&limit=5`);
+        const data = await res.json();
+        setLocationSuggestions(data.map((item: any) => item.display_name));
+      } catch (e) {
+        setLocationSuggestions([]);
+      }
+    };
+    if (showSuggestions) fetchSuggestions();
+  }, [formData.location, showSuggestions]);
 
   const [itemsData, setItemsData] = useState({
     donorName: "",
@@ -228,12 +257,46 @@ const Donate = () => {
                         onChange={(e) => setFormData(prev => ({ ...prev, contact: e.target.value }))}
                       />
                       <div className="flex space-x-3">
-                        <Input 
-                          placeholder="Building, Area/Block" 
-                          value={formData.location}
-                          onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                          className="flex-grow"
-                        />
+                        <div style={{ position: 'relative', width: '100%' }}>
+                          <Input
+                            placeholder="Building, Area/Block or Area Name"
+                            value={formData.location}
+                            onChange={e => {
+                              setFormData(prev => ({ ...prev, location: e.target.value }));
+                              setShowSuggestions(true);
+                            }}
+                            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                            onFocus={() => setShowSuggestions(true)}
+                            className="flex-grow"
+                          />
+                          {showSuggestions && locationSuggestions.length > 0 && (
+                            <ul style={{
+                              position: 'absolute',
+                              zIndex: 10,
+                              background: 'white',
+                              border: '1px solid #ccc',
+                              width: '100%',
+                              maxHeight: '180px',
+                              overflowY: 'auto',
+                              marginTop: 2,
+                              borderRadius: 4,
+                              boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+                            }}>
+                              {locationSuggestions.map((suggestion, idx) => (
+                                <li
+                                  key={idx}
+                                  style={{ padding: '8px', cursor: 'pointer' }}
+                                  onMouseDown={() => {
+                                    setFormData(prev => ({ ...prev, location: suggestion }));
+                                    setShowSuggestions(false);
+                                  }}
+                                >
+                                  {suggestion}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
                         <Button className="bg-brand-orange hover:bg-orange-600">
                           <Search size={20} />
                         </Button>
@@ -373,12 +436,19 @@ const Donate = () => {
                       </div>
                       <div>
                         <span className="block mb-2 font-medium">Pick a Time</span>
-                        <Input
-                          type="time"
+                        <select
                           value={selectedTime}
                           onChange={e => setSelectedTime(e.target.value)}
-                          className="w-40"
-                        />
+                          className="w-40 border rounded px-2 py-2"
+                          required
+                        >
+                          <option value="">-- Select Slot --</option>
+                          <option value="09:00-11:00">09:00 AM - 11:00 AM</option>
+                          <option value="11:00-13:00">11:00 AM - 01:00 PM</option>
+                          <option value="13:00-15:00">01:00 PM - 03:00 PM</option>
+                          <option value="15:00-17:00">03:00 PM - 05:00 PM</option>
+                          <option value="17:00-19:00">05:00 PM - 07:00 PM</option>
+                        </select>
                       </div>
                     </div>
                   </div>

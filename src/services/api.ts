@@ -15,7 +15,12 @@ export interface DonationData {
 export const api = {
   createDonation: async (data: DonationData) => {
     try {
-      const response = await axios.post(`${API_URL}/donations`, data);
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        `${API_URL}/donations`,
+        data,
+        token ? { headers: { Authorization: `Bearer ${token}` } } : {}
+      );
       return response.data;
     } catch (error) {
       throw error;
@@ -24,9 +29,14 @@ export const api = {
 
   getDonations: async (status?: string) => {
     try {
-      const response = await axios.get(`${API_URL}/donations`, {
-        params: { status }
-      });
+      const token = localStorage.getItem('token');
+      const response = await axios.get(
+        `${API_URL}/donations`,
+        {
+          params: { status },
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        }
+      );
       return response.data;
     } catch (error) {
       throw error;
@@ -35,7 +45,12 @@ export const api = {
 
   updateDonationStatus: async (id: string, status: string) => {
     try {
-      const response = await axios.put(`${API_URL}/donations/${id}`, { status });
+      const token = localStorage.getItem('token');
+      const response = await axios.put(
+        `${API_URL}/donations/${id}`,
+        { status },
+        token ? { headers: { Authorization: `Bearer ${token}` } } : {}
+      );
       return response.data;
     } catch (error) {
       throw error;
