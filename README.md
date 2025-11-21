@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Welcome to your Lovable project
 
 ## Project info
@@ -104,3 +105,7 @@ Add required environment variables to Render:
 - JWT_SECRET
 
 Yes it is!
+=======
+# Apna-Shelter-donation-service
+A simple and responsive cloth donation web page built for Apna Shelter India NGO. It allows donors to submit clothing details, contact information, and pickup locations while showcasing the NGO’s mission. Designed to make the donation process easier and increase community participation.
+>>>>>>> 23e459c4fcbec71ef33195eca52232ca9482c73d
