@@ -66,4 +66,41 @@ See `.github/workflows/ci-deploy.yml` for a CI example that builds the app on pu
 - Docker/VPS: build the Docker image and run as shown above.
 
 If you want, I can initialize a Git repo for you, create a remote GitHub repository, push the code, and (optionally) set up a simple Render or GitHub Actions deployment. Tell me which hosting provider you'd like (Render, Vercel, DigitalOcean App Platform, or a VPS) and whether you want me to create the GitHub repo and push (I'll need a GitHub access token if you want me to create the remote and push automatically).
+
+## Automation scripts
+
+Two helper scripts are included in `scripts/` to automate creating a GitHub repo and creating a Render service. They are intended to be run locally and read API keys from environment variables (so you don't paste secrets into chat).
+
+1) Create GitHub repo and push (PowerShell)
+
+Set `GITHUB_TOKEN` in your environment (PAT with repo scope) and run:
+
+```powershell
+cd <project-root>
+$env:GITHUB_TOKEN = "ghp_..." # set temporarily in the terminal
+.
+\scripts\create-github-repo.ps1 -RepoName "apparelcycle-hub" -Visibility "private" -Description "ApparelCycle Hub"
+```
+
+This script will create the repo under your account, add the `origin` remote and push `main`.
+
+2) Create Render service (PowerShell)
+
+Set `RENDER_API_KEY` in your environment and run:
+
+```powershell
+$env:RENDER_API_KEY = "render_..."
+.
+\scripts\deploy-to-render.ps1 -ServiceName "apparelcycle-hub" -RepoFullName "<owner>/<repo>" -Branch "main"
+```
+
+Note: Render's API can require additional fields depending on your account. If the script fails, use the Render Dashboard UI to connect GitHub and create a Web Service with the build and start commands below.
+
+Add required environment variables to Render:
+
+- MONGODB_URI
+- EMAIL_USER
+- EMAIL_PASS
+- JWT_SECRET
+
 Yes it is!
